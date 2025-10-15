@@ -1,0 +1,32 @@
+<nav class="navbar navbar-expand-md bg-body-light border-bottom sticky-top">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/">
+            <div class="navbar-logo">
+                <img src="/logo.png" alt="Nestigo" style="height: 100px; width: 102px ; background-color: transparent;" />
+            </div>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
+            aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <div class="navbar-nav">
+                <a class="nav-link" aria-current="page" href="#">Home</a>
+                <a class="nav-link" href="/listings">All listings</a>
+                <a class="nav-link" href="/listings/new">Add new listings</a>
+            </div>
+            <div class="navbar-nav ms-auto">
+                <!-- It shows signup login button when user is not logged in -->
+                <% if(!currUser) {%>
+                <a class="nav-link" aria-current="page" href="/signup">Sign up</a>
+                <a class="nav-link" href="/login">Login</a>
+                <% } %>
+
+                <!-- When user logged in, then only it will show logout button -->
+                <% if(currUser) {%>
+                <a class="nav-link" href="/logout">Logout</a>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</nav>
