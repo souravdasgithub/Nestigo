@@ -5,54 +5,22 @@ const wrapAsync = require("../utils/wrapAsync");
 const passport = require("passport");
 const { saveRedirectUrl } = require("../middleware.js");
 
+const userController = require("../controllers/user.js");
+const user = require("../models/user.js");
+
 //signup route
-router.get("/signup", (req, res) => {
-    res.render("users/signup.ejs");
-});
-
-router.post("/signup", wrapAsync(async (req, res) => {
-    try {
-        let { username, email, password } = req.body;
-        const newUser = new User({ email, username });
-        const registeredUser = await User.register(newUser, password);
-        console.log(registeredUser);
-        req.login(registeredUser , (err)=>{
-            if(err){
-                return next(err);
-            }
-            req.flash("success", "Successfully Registered! Welcome to Nestigo");
-        res.redirect("/listings");
-        })
-        
-    } catch (error) {
-        req.flash("error", error.message);
-        res.redirect("./signup");
-    }
-
-}));
-
+router.route("/signup")
+.get(userController.renderSignupForm)
+.post(wrapAsync(userController.singup));
 
 //login route
-router.get("/login", (req, res) => {
-    res.render("users/login.ejs");
-});
-
-router.post("/login", saveRedirectUrl, passport.authenticate("local", { failureRedirect: "/login", failureFlash: true }), async (req, res) => {
-    req.flash("success", "Welcome to Nestigo");
-    const redirectUrl = req.session.redirectUrl || "/listings";
-    delete req.session.redirectUrl;
-    res.redirect(redirectUrl);
-});
+router.route("/login")
+.get(userController.renderLoginupForm)
+.post(saveRedirectUrl, passport.authenticate("local", { failureRedirect: "/login", failureFlash: true }), 
+userController.login,
+);
 
 //logout route
-router.get("/logout" , (req, res, next)=>{
-    req.logout((err)=>{
-        if(err){
-           return next(err);
-        }
-        req.flash("success" ,"You logged out successfully!");
-        res.redirect("/listings");
-    });
-});
+router.get("/logout" , userController.logout);
 
 module.exports = router;

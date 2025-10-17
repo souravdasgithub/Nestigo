@@ -3,62 +3,75 @@ const Review = require("./models/review.js");
 const ExpressError = require("./utils/ExpressError.js");
 const { listingSchema, reviewSchema } = require("./schema.js");
 
+
 module.exports.isLoggedIn = (req, res, next) => {
     if (!req.isAuthenticated()) {
+        // save requested url and redirect to login
         req.session.redirectUrl = req.originalUrl;
-        req.flash("error", "You must be logged in to create listing!");
-        return res.redirect("/login");
+        req.flash("error", "You must be signed in");
+        return res.redirect("/login"); // RETURN to avoid calling next()
     }
-    next();
+    return next();
 };
 
 module.exports.saveRedirectUrl = (req, res, next) => {
-    if (req.session.redirectUrl) {
-        res.locals.redirectUrl = req.session.redirectUrl;
+    // only set if not already set and referer is valid (so clicking Login from any page returns)
+    const referer = req.get("Referer");
+    if (!req.session.redirectUrl && referer && !referer.includes("/login") && !referer.includes("/signup")) {
+        req.session.redirectUrl = referer.replace(/^.*\/\/[^\/]+/, '');
     }
-    next();
+    return next();
 };
 
-//Owner validation
+// Owner validation
 module.exports.isOwner = async (req, res, next) => {
-    let { id } = req.params;
-    let listing = await Listing.findById(id);
-    if (!listing.owner._id.equals(res.locals.currUser._id)) {
-        req.flash("error", "You're not the owner of this listing.");
+    const { id } = req.params;
+    const listing = await Listing.findById(id);
+    if (!listing) {
+        req.flash("error", "Listing not found.");
+        return res.redirect("/listings");
+    }
+    const ownerId = listing.owner && listing.owner._id ? listing.owner._id : listing.owner;
+    if (!ownerId || !ownerId.equals(res.locals.currUser._id)) {
+        req.flash("error", "You don't have permission to do that.");
         return res.redirect(`/listings/${id}`);
     }
-    next();
+    return next();
 };
 
-//Listing validation
+// Listing validation
 module.exports.validateListing = (req, res, next) => {
-    let { error } = listingSchema.validate(req.body);
+    const { error } = listingSchema.validate(req.body);
     if (error) {
-        let errMsg = error.details.map((el) => el.message).join(",");
-        throw new ExpressError(400, errMsg);
-    } else {
-        next();
+        const msg = error.details.map(el => el.message).join(", ");
+        // Throw so the centralized error handler handles the response (prevents double-send)
+        throw new ExpressError(msg, 400);
     }
+    return next();
 };
 
-//Review validation
+// Review validation
 module.exports.validateReview = (req, res, next) => {
-    let { error } = reviewSchema.validate(req.body);
+    const { error } = reviewSchema.validate(req.body);
     if (error) {
-        let errMsg = error.details.map((el) => el.message).join(",");
-        throw new ExpressError(400, errMsg);
-    } else {
-        next();
+        const msg = error.details.map(el => el.message).join(", ");
+        throw new ExpressError(msg, 400);
     }
+    return next();
 };
 
-//Review Owner validation
+// Review Owner validation
 module.exports.isReviewAuthor = async (req, res, next) => {
-    let { id,reviewId } = req.params;
-    let listing = await Review.findById(reviewId);
-    if (!listing.author._id.equals(res.locals.currUser._id)) {
-        req.flash("error", "You're not the author of this listing.");
+    const { id, reviewId } = req.params;
+    const review = await Review.findById(reviewId);
+    if (!review) {
+        req.flash("error", "Review not found.");
         return res.redirect(`/listings/${id}`);
     }
-    next();
+    const authorId = review.author && review.author._id ? review.author._id : review.author;
+    if (!authorId || !authorId.equals(res.locals.currUser._id)) {
+        req.flash("error", "You don't have permission to do that.");
+        return res.redirect(`/listings/${id}`);
+    }
+    return next();
 };

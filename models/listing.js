@@ -1,6 +1,6 @@
 const { ref } = require('joi');
 const mongoose = require('mongoose');
-const review = require('./review');
+const Review = require('./review');
 const Schema = mongoose.Schema;
 
 const listingSchema = new Schema({
@@ -12,9 +12,8 @@ const listingSchema = new Schema({
         type: String
     },
     image: {
-        type: String,
-        // // default : "https://unsplash.com/photos/green-plants-on-brown-concrete-building-KLOW1bD616Y",
-        // set : (v) => v === "" ? "https://unsplash.com/photos/green-plants-on-brown-concrete-building-KLOW1bD616Y" : v,
+       url : String,
+       filename : String,
     },
     price: {
         type: Number,
