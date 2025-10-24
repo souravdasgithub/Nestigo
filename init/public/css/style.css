@@ -81,10 +81,12 @@ body {
 .btns {
     display: flex;
 }
-.show-card{
+
+.show-card {
     padding-left: 0;
     padding-right: 0;
 }
+
 /* footer */
 .f-info {
     margin-top: 2rem;
@@ -121,4 +123,10 @@ body {
 .f-info-socials i {
     font-size: 1.2 rem;
     margin-right: 2rem;
+}
+
+/* Map */
+#map {
+    height: 400px;
+    width: 90vh;
 }
