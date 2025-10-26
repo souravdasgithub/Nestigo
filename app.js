@@ -14,6 +14,7 @@ const { listingSchema, reviewSchema } = require("./schema.js");
 const Review = require("./models/review.js");
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
+const MongoStore = require('connect-mongo');
 const flash = require("connect-flash");
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
@@ -28,8 +29,8 @@ const reviewsRouter = require("./routes/review.js");
 //require user route from routes/review.js
 const userRouter = require("./routes/user.js");
 
-const mongoUrl = process.env.MONGODB_URL;
-// const mongoUrl = "mongodb://127.0.0.1:27017/nestigo";
+const dbUrl = process.env.ATLASDB_URL;
+
 
 main()
     .then(() => {
@@ -40,7 +41,7 @@ main()
     });
 
 async function main() {
-    await mongoose.connect(mongoUrl);
+    await mongoose.connect(dbUrl);
 }
 
 // View engine and middleware setup
@@ -53,8 +54,21 @@ app.use(express.static(path.join(__dirname, "init", "public")));
 
 app.use(cookieParser("secretcode"));
 
+const store = MongoStore.create({
+    mongoUrl: dbUrl,
+    crypto: {
+        secret: process.env.SECRET,
+    },
+    touchAfter: 24 * 3600,
+});
+
+store.on("error", () => {
+    console.log("ERROR in MONGO SESSION STORE", err);
+});
+
 const sessionOptions = {
-    secret: "mysupersecretcode",
+    store,
+    secret: process.env.SECRET,
     resave: false,
     saveUninitialized: true,
     cookie: {
@@ -63,6 +77,7 @@ const sessionOptions = {
         httpOnly: true,
     },
 };
+
 
 app.use(session(sessionOptions));
 app.use(flash());
@@ -92,11 +107,6 @@ app.get("/demouser", async (req, res) => {
     res.send(registeredUser);
 });
 
-app.get("/", (req, res) => {
-    console.dir(req.cookies);
-    res.send("Root is working");
-});
-
 app.get("/greet", (req, res) => {
     let { name = "anonymous" } = req.cookies;
     res.send(`Hi, ${name}`);
@@ -123,7 +133,7 @@ app.use("/listings", listingsRouter);
 //use review schema which defines in routes/review.js
 app.use("/listings/:id/reviews", reviewsRouter);
 
-app.use("/" , userRouter);
+app.use("/", userRouter);
 
 // 404 handler
 app.all("*", (req, res, next) => {
