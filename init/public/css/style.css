@@ -130,3 +130,144 @@ body {
     height: 400px;
     width: 90vh;
 }
+
+/* ----------- Responsive Fix for Show Page ----------- */
+@media (max-width: 992px) {
+  .show-card {
+    width: 100%;
+    margin: 0 auto;
+    padding: 1rem;
+  }
+
+  .col-8.offset-3, 
+  .col-6.offset-3, 
+  .col-8.offset-3.mb-3 {
+    width: 100%;
+    margin: 0 auto !important;
+    padding: 0 1rem;
+  }
+
+  .btns {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 0.5rem;
+  }
+
+  #map {
+    width: 100%;
+    height: 300px;
+  }
+}
+
+@media (max-width: 576px) {
+  .show-img {
+    height: auto;
+    max-height: 40vh;
+  }
+
+  .btns {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .card.col-5.ms-3.mb-3 {
+    width: 100%;
+    margin-left: 0 !important;
+  }
+
+  .review-section,
+  .card-body {
+    text-align: left;
+  }
+
+  #map {
+    height: 250px;
+  }
+}
+/* ========== RESPONSIVE FIXES (Preserve Original Design) ========== */
+
+/* For tablets (max-width: 992px) */
+@media (max-width: 992px) {
+  /* Center & resize main container */
+  .col-8.offset-3,
+  .col-6.offset-3 {
+    width: 100%;
+    margin-left: 0 !important;
+    padding: 0 1rem;
+  }
+
+  .show-card {
+    width: 100%;
+    margin: 0 auto;
+    padding: 0.5rem;
+  }
+
+  /* Buttons */
+  .btns {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 0.5rem;
+  }
+
+  /* Map responsiveness */
+  #map {
+    width: 100%;
+    height: 300px;
+  }
+
+  /* Review cards wrap neatly */
+  .row .card.col-5.ms-3.mb-3 {
+    flex: 1 1 100%;
+    margin: 0.5rem 0 !important;
+  }
+}
+
+/* For mobiles (max-width: 576px) */
+@media (max-width: 576px) {
+  .show-card {
+    width: 100%;
+    padding: 0.5rem;
+  }
+
+  .show-img {
+    width: 100%;
+    height: auto;
+    max-height: 45vh;
+    object-fit: cover;
+  }
+
+  /* Left-align text and reviews */
+  .card-body,
+  .card-text,
+  .review-section,
+  .row .card.col-5.ms-3.mb-3 {
+    text-align: left !important;
+  }
+
+  /* Buttons stack nicely */
+  .btns {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  /* Map */
+  #map {
+    width: 100%;
+    height: 250px;
+  }
+
+  /* Footer stack */
+  .f-info {
+    flex-direction: column;
+    height: auto;
+    padding: 1rem;
+  }
+
+  .f-info-links,
+  .f-info-socials,
+  .f-info-companyName {
+    flex-direction: column;
+    margin-top: 0.5rem;
+  }
+}
+
